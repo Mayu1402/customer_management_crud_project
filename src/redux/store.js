@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import customerReducer from "./CustomerSlice";
-
-export const store=configureStore({
-    reducer:{
-        customer:customerReducer,
-    },
+//Configure and create the Redux store
+export const store = configureStore({
+  reducer: {
+    //Add the customer slice reducer to the store
+    customer: customerReducer,
+  },
 });
