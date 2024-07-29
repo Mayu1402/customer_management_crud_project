@@ -12,8 +12,6 @@ function App() {
         <Route path="/" element={<CustomerForm />} />
         <Route path="/customers" element={<CustomerList />} />
         <Route path="/edit-customer/:index" element={<EditCustomer />} />
-
-
       </Routes>
     </Router>
   );

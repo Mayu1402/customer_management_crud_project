@@ -1,6 +1,7 @@
 import React ,{ useState} from "react";
-import {TextField,Button, Container, Box, Typography, CircularProgress} from "@mui/material";
+import {TextField,Button, Container, Box, Typography, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText} from "@mui/material";
 import { useDispatch } from "react-redux";
+import {useNavigate} from "react-router-dom";
 
 
 import axios from "axios";
@@ -9,6 +10,8 @@ import { validatePAN,validateEmail,validateFullName,validateMobileNumber, valida
 import AddressForm from "./AddressForm";
 import { addCustomer } from "../redux/CustomerSlice";
 export const CustomerForm=()=>{
+    const [open,setOpen]=useState(false);
+    const navigate=useNavigate();
     const dispatch=useDispatch();
     const[formData,setformData]=useState({
         PAN:"",
@@ -24,6 +27,12 @@ export const CustomerForm=()=>{
 
     const handleChange=(e)=>{
         const{name,value}=e.target;
+        
+        setvalidationErrors((prevErrors)=>({
+            ...prevErrors,
+            [name]:"",
+        }));
+
         setformData((prevData)=>({
             ...prevData,
             [name]:value
@@ -34,6 +43,14 @@ export const CustomerForm=()=>{
         const {name,value}=e.target;
         const newAddresses=[...formData.addresses];
         newAddresses[index][name]=value;
+
+        setvalidationErrors((prevErrors)=>{
+            const newErrors={ ...prevErrors};
+            if(newErrors.addresses&&newErrors.addresses[index]){
+                newErrors.addresses[index][name]="";
+            }
+            return newErrors;
+        });
         setformData(prevData=>({
             ...prevData,
             addresses:newAddresses
@@ -92,8 +109,22 @@ export const CustomerForm=()=>{
         }
 
         dispatch(addCustomer(formData));
+        setOpen(true);
         console.log(formData);
     };
+
+    const handleClose=()=>{
+        setOpen(false);
+        setformData({
+            PAN:"",
+            fullName:"",
+            email:"",
+            mobileNumber:"",
+            addresses:[{address1:"",address2:"",postcode:"",city:"",state:""}]
+
+        });
+        navigate("/");
+    }
 
     const verifyPAN=async()=>{
         if(!validatePAN(formData.PAN)) return;
@@ -250,6 +281,17 @@ export const CustomerForm=()=>{
                 Submit</Button>
         </form>
         </Box>
+        <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Success</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    Customer data successfully submitted.
+                </DialogContentText>
+            </DialogContent>
+            <Button onClick={handleClose} color="primary">
+                OK
+            </Button>
+        </Dialog>
         </Container>
     );
 };
